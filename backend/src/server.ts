@@ -22,24 +22,19 @@ export default class Server {
 	}
 
 	public async start() {
+		console.log('🚪 Frontend origin:', FRONTEND_ORIGIN);
+
 		await new Promise<void>((resolve, reject) => {
 			this.httpServer = this.app.listen(PORT, (error?: Error) => {
-				if (error) {
-					return reject(new Error(`❌ Server could not be started: ${error.message}`));
+				if (!error) {
+					return resolve();
 				}
-				console.log(`🚀 Server started, listening on http://localhost:${PORT}`);
-				resolve();
+				reject(new Error(`❌ Server could not be started: ${error.message}`));
 			});
 		});
-		console.log('🚪 Frontend origin:', FRONTEND_ORIGIN);
-		this.socketServer = new SocketIOServer(this.httpServer!, {
-			cors: {
-				origin: FRONTEND_ORIGIN,
-				credentials: true,
-			},
-			maxHttpBufferSize: 100 * 1024 * 1024,
-		});
-		console.log('🔌 Socket server ready.');
+		console.log(`🚀 Server started, listening on port ${PORT}...`);
+
+		this.initializeSocketServer();
 	}
 
 	public stop() {
@@ -62,6 +57,8 @@ export default class Server {
 			this.app.use(routerConfig.middlware);
 		}
 	}
+
+	/* REST API */
 
 	private registerRoutes() {
 		Server.registerRouter(this.app, routerConfig.routers);
@@ -95,8 +92,35 @@ export default class Server {
 	private registerErrorHandlers() {
 		// TODO: register custom error handlers
 		this.app.use((request: Request, response: Response) => {
-			response.status(StatusCodes.NOT_FOUND);
-			sendErrorResponse({ error: 'EndpointNotFoundError' }, response);
+			let errorName = 'ServerError';
+			if (response.statusCode !== StatusCodes.INTERNAL_SERVER_ERROR) {
+				response.status(StatusCodes.NOT_FOUND);
+				errorName = 'NotFoundError';
+			}
+			sendErrorResponse({ error: errorName }, response);
+		});
+	}
+
+	/* Socket.io Server */
+
+	private initializeSocketServer() {
+		this.socketServer = new SocketIOServer(this.httpServer!, {
+			cors: {
+				origin: FRONTEND_ORIGIN,
+				credentials: true,
+			},
+			// maxHttpBufferSize: 100 * 1024 * 1024,
+		});
+		console.log('🔌 Socket server ready!');
+
+		this.registerSocketConnectionEvent();
+	}
+
+	private registerSocketConnectionEvent() {
+		this.socketServer!.on('connection', (socket) => {
+			console.log(`⚡️ Socket connected: ${socket.id}`);
+
+			// TODO: register event listeners for the socket connection
 		});
 	}
 }
