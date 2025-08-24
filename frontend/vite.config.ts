@@ -7,7 +7,7 @@ import { build, defineConfig, type PluginOption } from 'vite';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const __pages_dirname = resolve(__dirname, 'app', 'pages');
 
-const PROD = process.env.NODE_ENV === 'production';
+const PRODUCTION = process.env.NODE_ENV === 'production';
 
 export default defineConfig({
 	appType: 'custom',
@@ -22,10 +22,11 @@ export default defineConfig({
 		},
 		outDir: '../dist/client',
 		emptyOutDir: true,
-		minify: PROD,
-		cssMinify: PROD,
-		watch: PROD ? null : {},
+		minify: PRODUCTION,
+		cssMinify: PRODUCTION,
+		watch: PRODUCTION ? null : {},
 	},
+	envDir: '../',
 });
 
 function buildSSREntry(buildEnd?: (error?: Error) => Promise<void>): PluginOption {
@@ -41,13 +42,13 @@ function buildSSREntry(buildEnd?: (error?: Error) => Promise<void>): PluginOptio
 					ssr: serverEntryFile,
 					outDir: 'dist/server',
 					emptyOutDir: true,
-					minify: PROD,
-					cssMinify: PROD,
+					minify: PRODUCTION,
+					cssMinify: PRODUCTION,
 				},
 				configFile: false,
 			});
 			// watch SSR server entry for changes
-			if (!PROD) {
+			if (!PRODUCTION) {
 				this.addWatchFile(resolve(__dirname, serverEntryFile));
 			}
 		},

@@ -47,7 +47,7 @@ export default class APIRequestController {
 			callback?.();
 		} catch (error) {
 			if (axios.isCancel(error)) {
-				throw new APIRequestCanceledError(error.message);
+				throw new APIRequestCanceledError('Request timed out.');
 			}
 			throw new APIRequestError((error as Error).message);
 		}

@@ -45,7 +45,7 @@ export class APIController {
 		);
 	}
 
-	private enqueueRequest(options: APIRequestOptions<any>) {
+	private addRequest(options: APIRequestOptions<any>) {
 		let requestId: string;
 		do {
 			requestId = uuid().toString();
@@ -57,7 +57,7 @@ export class APIController {
 		return requestController;
 	}
 
-	private dequeueRequest(requestId: string) {
+	private removeRequest(requestId: string) {
 		const request = this.requests.get(requestId);
 		if (request) {
 			request.abort();
@@ -65,49 +65,49 @@ export class APIController {
 		}
 	}
 
-	public async get<T, D>(url: string, options: APIRequestOptions<D> = {}): Promise<T> {
-		const requestController = this.enqueueRequest(options);
+	public async get<T, D = undefined>(url: string, options: APIRequestOptions<D> = {}): Promise<T> {
+		const requestController = this.addRequest(options);
 		return requestController.dispatch<T, D>(
 			(requestConfig) => this._api.get(url, requestConfig),
-			() => this.dequeueRequest(requestController.id)
+			() => this.removeRequest(requestController.id)
 		);
 	}
 
 	public async post<T, D>(url: string, data?: D, options: APIRequestOptions<D> = {}): Promise<T> {
-		const requestController = this.enqueueRequest(options);
+		const requestController = this.addRequest(options);
 		return requestController.dispatch<T, D>(
 			(requestConfig) => this._api.post(url, data, requestConfig),
-			() => this.dequeueRequest(requestController.id)
+			() => this.removeRequest(requestController.id)
 		);
 	}
 
 	public async put<T, D>(url: string, data?: D, options: APIRequestOptions<D> = {}): Promise<T> {
-		const requestController = this.enqueueRequest(options);
+		const requestController = this.addRequest(options);
 		return requestController.dispatch<T, D>(
 			(requestConfig) => this._api.put(url, data, requestConfig),
-			() => this.dequeueRequest(requestController.id)
+			() => this.removeRequest(requestController.id)
 		);
 	}
 
 	public async patch<T, D>(url: string, data?: D, options: APIRequestOptions<D> = {}): Promise<T> {
-		const requestController = this.enqueueRequest(options);
+		const requestController = this.addRequest(options);
 		return requestController.dispatch<T, D>(
 			(requestConfig) => this._api.put(url, data, requestConfig),
-			() => this.dequeueRequest(requestController.id)
+			() => this.removeRequest(requestController.id)
 		);
 	}
 
 	public async delete<T, D>(url: string, options: APIRequestOptions<D> = {}): Promise<T> {
-		const requestController = this.enqueueRequest(options);
+		const requestController = this.addRequest(options);
 		return requestController.dispatch<T, D>(
 			(requestConfig) => this._api.delete(url, requestConfig),
-			() => this.dequeueRequest(requestController.id)
+			() => this.removeRequest(requestController.id)
 		);
 	}
 
 	public clear() {
 		for (const requestId of this.requests.keys()) {
-			this.dequeueRequest(requestId);
+			this.removeRequest(requestId);
 		}
 	}
 

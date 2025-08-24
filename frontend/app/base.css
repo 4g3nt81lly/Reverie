@@ -12,9 +12,12 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-html,
 body {
-	@apply m-0 h-full flex overflow-hidden;
+	@apply m-0 h-screen flex overflow-hidden;
+}
+
+#root {
+	@apply size-full;
 }
 
 @media (prefers-color-scheme: light) {

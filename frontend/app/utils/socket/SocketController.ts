@@ -1,10 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { SocketEmitResponseError, SocketEmitTimeoutError, SocketError } from '../../errors/socket';
 import type { SocketResponse } from '../../types/socket';
-import { debugLog, getAccessToken, isPresent } from '../helpers';
 import type { Nullable } from '../../types/utility';
+import { debugLog, getAccessToken, isPresent } from '../helpers';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+const SOCKET_PATH = import.meta.env.VITE_SOCKET_PATH ?? '/socket.io';
 
 export class SocketController {
 	private _socket: Socket;
@@ -16,6 +17,7 @@ export class SocketController {
 			throw new SocketError('Missing socket URL.');
 		}
 		this._socket = io(SOCKET_URL, {
+			path: SOCKET_PATH,
 			autoConnect: false,
 			auth: (callback) => callback({ accessToken: this._getAccessToken() }),
 		});

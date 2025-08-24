@@ -4,10 +4,10 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "tsc -b && NODE_ENV=production vite build",
-		"build:dev": "tsc -b && NODE_ENV=dev vite build",
+		"build": "NODE_ENV=production vite build",
+		"build:dev": "NODE_ENV=development vite build",
 		"start": "NODE_ENV=production ts-node server/main.ts",
-		"start:dev": "NODE_ENV=dev nodemon server/main.ts",
+		"start:dev": "NODE_ENV=development nodemon server/main.ts",
 		"clean": "rm -rf dist node_modules/.tmp",
 		"prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,css,json,md}\""
 	},
